@@ -10,7 +10,9 @@ createRoot(document.getElementById('root')).render(
   <BrowserRouter>
     <Toaster />
     <NextUIProvider>
-      <App />
+      <main className="dark text-foreground bg-slate-800">
+        <App />
+      </main>
     </NextUIProvider>
   </BrowserRouter>,
 )

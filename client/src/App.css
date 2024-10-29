@@ -19,3 +19,17 @@ input[type="number"]::-webkit-outer-spin-button {
   -webkit-appearance: none;
   margin: 0;
 }
+
+/* Add this CSS to your stylesheet or within a <style> tag */
+@keyframes fillLeftToRight {
+  from {
+    width: 0;
+  }
+  to {
+    width: 100%;
+  }
+}
+
+.fill-left-to-right {
+  animation: fillLeftToRight 0.5s forwards;
+}
