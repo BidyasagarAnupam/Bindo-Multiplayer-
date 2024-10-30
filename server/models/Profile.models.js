@@ -26,7 +26,6 @@ const ProfileSchema = new Schema({
     },
     avatar: {
         type: String,
-        required: true,
     },
     totalGamePlayed: {
         type: Number,
@@ -36,6 +35,10 @@ const ProfileSchema = new Schema({
         type: Number,
         default: 0,
     },
+    coins: {
+        type: Number,
+        default: 50,
+    }
 },
     {
         timestamps: true,

@@ -2,6 +2,8 @@ import React, { useEffect, useState } from 'react'
 import useDocumentTitle from "../hooks/useDocumentTitle";
 import { toast } from "react-hot-toast";
 import '../App.css'
+import { Button, Divider } from "@nextui-org/react";
+import Board from '../components/common/Board';
 
 
 const CreateBoard = () => {
@@ -39,31 +41,65 @@ const CreateBoard = () => {
   };
 
   useEffect(() => {
-    console.log("board", board);
+    // console.log("board", board);
   }, [board])
 
-  return (
-    <div className="flex items-center justify-center">
-      <div className="bg-white shadow-md rounded-lg p-4">
-        <h1 className="text-2xl font-bold text-center mb-4 text-gray-700">Create your Bingo Board</h1>
-        <div className="grid grid-cols-5 gap-2">
-          {board.map((row, rowIndex) =>
-            row.map((cell, colIndex) => (
+  const generateRandomBoard = () => {
+    const numbers = Array.from({ length: 25 }, (_, i) => i + 1); // Generate numbers 1-25
+    const shuffledNumbers = numbers.sort(() => Math.random() - 0.5); // Shuffle array
 
-              <input
-                key={`${rowIndex}-${colIndex}`}
-                id={`${rowIndex}-${colIndex}`}
-                type="number"
-                min="1"
-                max="25"
-                className="w-16 h-16 text-center border bg-slate-900 border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400 text-white text-lg appearance-none"
-                onChange={(e) => handleInputChange(rowIndex, colIndex, e.target.value)}
-              />
-            ))
-          )}
+    // Fill 5x5 grid with shuffled numbers
+    const newBoard = Array.from({ length: 5 }, (_, row) =>
+      Array.from({ length: 5 }, (_, col) => shuffledNumbers[row * 5 + col])
+    );
+
+    setBoard(newBoard);
+  };
+
+  const clearBoardHandler = () => {
+    setBoard(Array(5).fill(Array(5).fill(null)))
+  }
+
+
+  return (
+    <div className="h-[93.5vh]  flex flex-col items-center justify-center gap-6">
+      <Board heading='Create your BINGO board' board={board} handleInputChange={handleInputChange} readOnly={false} />
+      <div className='flex flex-col gap-3 w-4/5 md:w-2/5 lg:w-2/6 xl:w-1/5 items-center justify-center'>
+        <div className='flex gap-4 w-full'>
+          <Button
+            className='text-xl font-semibold w-full md:w-full '
+            color='primary'
+            variant='shadow'
+            onClick={() => console.log(board)}
+          >
+            Save
+          </Button>
+          <Button
+            className='text-xl font-semibold w-full md:w-full '
+            color='danger'
+            variant='shadow'
+            onClick={clearBoardHandler}
+          >
+            Clear Board
+          </Button>
         </div>
+        <div className='flex  gap-2 items-center justify-center w-full'>
+          <Divider className='bg-white w-1/3'/>
+          <span>OR</span>
+          <Divider className='bg-white w-1/3' />
+        </div>
+
+        <Button
+          className='text-xl font-semibold text-black w-full bg-yellow-300'
+          variant='shadow'
+          onClick={generateRandomBoard}
+        >
+          Generate
+        </Button>
       </div>
+      
     </div>
+
   )
 }
 

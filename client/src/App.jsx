@@ -1,30 +1,43 @@
 import './App.css'
-import React, { useEffect, useState } from 'react'
+import React, { Suspense, lazy, } from 'react'
 import { Routes, Route } from 'react-router-dom';
+import { DotLottieReact } from '@lottiefiles/dotlottie-react';
 
-import Home from './pages/Home';
-import CreateBoard from './pages/CreateBoard';
-import NavBar from './components/common/Navbar';
+const Home = lazy(() => import('./pages/Home'));
+const CreateBoard = lazy(() => import('./pages/CreateBoard'));
+const NavBar = lazy(() => import('./components/common/Navbar'));
+const AllBoards = lazy(() => import('./pages/AllBoards'));
 
 const App = () => {
 
 
 
   return (
-    <div className='dark:bg-slate-950 h-screen'>
-      <NavBar />
-      <Routes>
-        <Route
-          path="/"
-          element={<Home/>}
-        />
-        <Route 
-          path="/create-board"
-          element={<CreateBoard/>}
-        />
-
-      </Routes>
-    </div>
+    <Suspense fallback={
+      <DotLottieReact
+        src="https://lottie.host/753b35a4-05c3-49ea-bc26-6e7b6832df98/54SX878Rgh.json"
+        loop
+        autoplay
+      />
+    }>
+      <div className='dark:bg-slate-950 h-auto'>
+        <NavBar />
+        <Routes>
+          <Route
+            path="/"
+            element={<Home />}
+          />
+          <Route
+            path="/create-board"
+            element={<CreateBoard />}
+          />
+          <Route
+            path="/all-boards"
+            element={<AllBoards />}
+          />
+        </Routes>
+      </div>
+    </Suspense>
   );
 };
 

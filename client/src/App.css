@@ -33,3 +33,16 @@ input[type="number"]::-webkit-outer-spin-button {
 .fill-left-to-right {
   animation: fillLeftToRight 0.5s forwards;
 }
+
+@keyframes fillLeftToRightMobile {
+  from {
+    width: 0;
+  }
+  to {
+    width: 30%;
+  }
+}
+
+.fill-left-to-right-mobile {
+  animation: fillLeftToRightMobile 0.5s forwards;
+}

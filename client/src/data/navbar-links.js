@@ -13,7 +13,7 @@ export const NavbarLinks = [
   {
     id: 3,
     title: "All Boards",
-    path: "/all-board",
+    path: "/all-boards",
   },
 
 
