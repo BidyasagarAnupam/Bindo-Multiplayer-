@@ -15,6 +15,16 @@ export const NavbarLinks = [
     title: "All Boards",
     path: "/all-boards",
   },
+  {
+    id: 4,
+    title: "How to Play ?",
+    path: "/how-to-play"
+  },
+  {
+    id: 5,
+    title: "About",
+    path: "/about"
+  }
 
 
 ];

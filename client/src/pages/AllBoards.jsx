@@ -1,9 +1,14 @@
-import React from 'react';
+import React, { useState } from 'react';
 import Board from '../components/common/Board';
 import { Button } from "@nextui-org/button";
+import { Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, useDisclosure } from "@nextui-org/modal";
+import { Divider } from '@nextui-org/react';
 
 const AllBoards = () => {
     // Dummy data for 5 boards, each with a 5x5 grid
+    const [board, setBoard] = useState([[]]);
+    const [openModal, setOpenModal] = useState(false);
+    const { isOpen, onOpen, onOpenChange } = useDisclosure();
     const boards = [
         [
             [1, 2, 3, 4, 5],
@@ -42,6 +47,11 @@ const AllBoards = () => {
         ]
     ];
 
+    const useBoardHandler = (board) => {
+        setBoard(board)
+        onOpen()
+    }
+
     return (
         <div className="container mx-auto p-4">
             <h1 className="text-yellow-500 text-2xl font-bold mb-6 text-center">All Boards</h1>
@@ -57,13 +67,73 @@ const AllBoards = () => {
                         <Button
                             variant='solid'
                             className='font-semibold bg-yellow-300 text-black'
+                            onPress={() => useBoardHandler(board)}
                         >
                             Use this Board
                         </Button>
                     </div>
                 ))}
             </div>
-     
+
+            {/* Modal for opening the game */}
+            <Modal
+                isOpen={isOpen}
+                onOpenChange={onOpenChange}
+                className='dark text-foreground'
+                size='5xl'
+            >
+                <ModalContent>
+                    {(onClose) => (
+                        <>
+                            <ModalHeader className="flex flex-col gap-1">Game set-up</ModalHeader>
+                            <ModalBody>
+                                <div className='flex gap-5  justify-around'>
+                                    <div className='flex flex-col gap-3'>
+                                        <p className='text-lg'>You have chosen the following board:</p>
+                                        <Board
+                                            heading={`Chosen Board`}
+                                            board={board}
+                                            handleInputChange={() => { }} // Disable modification
+                                            readOnly={true}
+                                        />
+                                    </div>
+                                    <div className='w-1/3 flex flex-col gap-3 items-center justify-center'>
+                                        <p className='text-2xl font-semibold'>Play Game using:</p>
+                                        <Button
+                                            className='text-xl font-semibold w-full'
+                                            color='primary'
+                                            variant='shadow'
+                                            onClick={() => console.log(board)}
+                                        >
+                                            Search for an opponent
+                                        </Button>
+
+                                        <div className='flex  gap-2 items-center justify-center w-full'>
+                                            <Divider className='bg-white w-1/3' />
+                                            <span>OR</span>
+                                            <Divider className='bg-white w-1/3' />
+                                        </div>
+
+                                        <Button
+                                            className='text-xl font-semibold text-black w-full bg-yellow-300'
+                                            variant='shadow'
+                                            onClick={() => console.log("ok")}
+                                        >
+                                            Invite a friend
+                                        </Button>
+                                    </div>
+                                </div>
+
+                            </ModalBody>
+                            <ModalFooter>
+                                <Button color="danger" variant="flat" onPress={onClose}>
+                                    Close
+                                </Button>
+                            </ModalFooter>
+                        </>
+                    )}
+                </ModalContent>
+            </Modal>
         </div>
     );
 };

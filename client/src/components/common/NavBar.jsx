@@ -138,6 +138,7 @@ const NavBar = () => {
                 isOpen={isOpen}
                 onOpenChange={onOpenChange}
                 placement="auto"
+                backdrop='blur'
                 classNames={{
                     wrapper: "[--slide-exit:0px]",
                 }}
