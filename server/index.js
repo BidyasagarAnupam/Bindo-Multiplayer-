@@ -1,11 +1,15 @@
 import express from "express";
 import 'dotenv/config'
-import {connect} from "./config/database.js";
+import { connect } from "./config/database.js";
 import { createServer } from "http";
 import { Server } from "socket.io";
 import cookieParser from "cookie-parser";
 import cors from "cors";
 
+
+import userRoute from './routes/User.routes.js'
+import profileRoute from "./routes/Profile.routes.js";
+import boardRoute from "./routes/Board.routes.js";
 
 // Constants from .env
 const PORT = process.env.PORT || 3000;
@@ -33,17 +37,30 @@ const io = new Server(server, {
 
 app.set("io", io);
 
+io.on("connection", (socket) => {
+    console.log("a user connected", socket.id);
+
+
+    socket.on("disconnect", () => {
+        console.log("user disconnected");
+    });
+});
+
 // Apply middlewares
 app.use(express.json());
 app.use(cookieParser());
 app.use(cors(corsOptions));
 
+// mounting routes
+app.use("/api/v1/user", userRoute)
+app.use("/api/v1/profile", profileRoute)
+app.use("/api/v1/board", boardRoute)
 
 
 app.get("/", (req, res) => {
     res.send("Hello World");
 });
 
-app.listen(PORT, () => {
+server.listen(PORT, () => {
     console.log(`Server is running on port ${PORT}`);
 });

@@ -1,6 +1,8 @@
 import React from 'react'
 
-const PlayGame = () => {
+const PlayGame = ({
+  gameBoard, userDetails = null
+}) => {
   return (
     <div>PlayGame</div>
   )

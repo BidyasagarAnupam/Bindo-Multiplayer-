@@ -1,8 +1,8 @@
 import mongoose, { Schema, model, Types } from "mongoose";
-import { hash } from "bcryp";
+import { hash } from "bcrypt";
 
 const UserSchema = new Schema({
-    username: {
+    userName: {
         type: String,
         required: true,
         unique: true,
@@ -15,14 +15,12 @@ const UserSchema = new Schema({
     password: {
         type: String,
         required: true,
-    },
-    isOnline: {
-        type: Boolean,
-        default: false,
+        select: false,
     },
     profileDetails: {
         type: Types.ObjectId,
-        ref: 'Profile'
+        ref: 'Profile',
+        required: true
     },
     allBoards: [
         {
@@ -42,7 +40,7 @@ const UserSchema = new Schema({
     }
 );
 
-UserSchema.pre("save", async (next) => {
+UserSchema.pre("save", async function (next) {
     if (!this.isModified("password")) {
         return next();
     }

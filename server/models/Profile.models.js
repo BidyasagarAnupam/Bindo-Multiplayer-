@@ -5,24 +5,21 @@ import mongoose, { Schema, model, Types } from "mongoose";
 const ProfileSchema = new Schema({
     displayName: {
         type: String,
-        required: true,
+        // required: true,
         unique: true,
     },
     friends: [{
         type: Types.ObjectId,
         ref: 'User'
     }],
-    user: {
-        type: Types.ObjectId,
-        ref: 'User'
-    },
     gender: {
         type: String,
-        required: true,
+        // required: true,
+        enum: ["Male", "Female", "Other"],
     },
     dob: {
         type: Date,
-        required: true,
+        // required: true,
     },
     avatar: {
         type: String,
