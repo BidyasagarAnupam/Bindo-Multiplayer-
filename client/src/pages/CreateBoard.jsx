@@ -4,12 +4,17 @@ import { toast } from "react-hot-toast";
 import '../App.css'
 import { Button, Divider } from "@nextui-org/react";
 import Board from '../components/common/Board';
+import axios from "axios";
+import { useNavigate } from 'react-router-dom';
+import { serverURL } from '../constants/config';
 
 
 const CreateBoard = () => {
   useDocumentTitle("Create your BINGO boards | Bingo");
 
   const [board, setBoard] = useState(Array(5).fill(Array(5).fill(null)));
+  const [isLoading, setIsLoading] = useState(false);
+  const navigate = useNavigate();
 
   const handleInputChange = (row, col, value) => {
     const numValue = parseInt(value);
@@ -60,6 +65,47 @@ const CreateBoard = () => {
     setBoard(Array(5).fill(Array(5).fill(null)))
   }
 
+  const saveBoardHandler = async () => {
+    const toastId = toast.loading("Creating Board...");
+    setIsLoading(true);
+    // first check if the board is valid
+    // check if all cells are filled
+    const isBoardValid = board.every((row) => row.every((cell) => cell !== null));
+    if (!isBoardValid) {
+      toast.error("Please fill all cells before saving", {
+        id: toastId,
+      });
+      setIsLoading(false);
+      return;
+    }
+    // check all numbers are unique
+    const numbers = board.flat();
+    const uniqueNumbers = new Set(numbers);
+    if (numbers.length !== uniqueNumbers.size) {
+      toast.error("Numbers must be unique", {
+        id: toastId,
+      });
+      setIsLoading(false);
+      return;
+    }
+
+    // save the board
+    try {
+      const res = await axios.post(`${serverURL}/api/v1/board/create-board`, { board }, { withCredentials: true });
+      toast.success(res.data.message, {
+        id: toastId,
+      });
+      navigate("/all-boards")
+    } catch (error) {
+      console.log("Error", error);
+      toast.error(error?.response?.data?.message || "Something went wrong", {
+        id: toastId,
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  }
+
 
   return (
     <div className="h-[93.5vh]  flex flex-col items-center justify-center gap-6">
@@ -70,7 +116,8 @@ const CreateBoard = () => {
             className='text-xl font-semibold w-full md:w-full '
             color='primary'
             variant='shadow'
-            onClick={() => console.log(board)}
+            isLoading={isLoading}
+            onClick={() => saveBoardHandler()}
           >
             Save
           </Button>
@@ -78,13 +125,14 @@ const CreateBoard = () => {
             className='text-xl font-semibold w-full md:w-full '
             color='danger'
             variant='shadow'
+            isDisabled={isLoading}
             onClick={clearBoardHandler}
           >
             Clear Board
           </Button>
         </div>
         <div className='flex  gap-2 items-center justify-center w-full'>
-          <Divider className='bg-white w-1/3'/>
+          <Divider className='bg-white w-1/3' />
           <span>OR</span>
           <Divider className='bg-white w-1/3' />
         </div>
@@ -93,11 +141,12 @@ const CreateBoard = () => {
           className='text-xl font-semibold text-black w-full bg-yellow-300'
           variant='shadow'
           onClick={generateRandomBoard}
+          isDisabled={isLoading}
         >
           Generate
         </Button>
       </div>
-      
+
     </div>
 
   )

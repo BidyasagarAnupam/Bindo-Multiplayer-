@@ -10,6 +10,7 @@ import cors from "cors";
 import userRoute from './routes/User.routes.js'
 import profileRoute from "./routes/Profile.routes.js";
 import boardRoute from "./routes/Board.routes.js";
+import { errorMiddleware } from "./middlewares/tryCatch.js";
 
 // Constants from .env
 const PORT = process.env.PORT || 3000;
@@ -22,6 +23,7 @@ const corsOptions = {
     origin: [
         "http://localhost:5173",
         "http://localhost:4173",
+        "192.168.143.171:5173",
         CLIENT_URL,
     ],
     methods: ["GET", "POST", "PUT", "DELETE"],
@@ -50,6 +52,7 @@ io.on("connection", (socket) => {
 app.use(express.json());
 app.use(cookieParser());
 app.use(cors(corsOptions));
+app.use(express.urlencoded({ extended: true }));
 
 // mounting routes
 app.use("/api/v1/user", userRoute)
@@ -60,6 +63,8 @@ app.use("/api/v1/board", boardRoute)
 app.get("/", (req, res) => {
     res.send("Hello World");
 });
+
+app.use(errorMiddleware)
 
 server.listen(PORT, () => {
     console.log(`Server is running on port ${PORT}`);

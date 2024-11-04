@@ -91,7 +91,8 @@ const getAllBoards = TryCatch(async (req, res, next) => {
 
     return res.status(200).json({
         success: true,
-        boards: user.allBoards
+        boards: user.allBoards,
+        message: "All boards fetched successfully"
     });
 })
 

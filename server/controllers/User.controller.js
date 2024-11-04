@@ -1,6 +1,6 @@
 import { TryCatch } from "../middlewares/tryCatch.js";
 import { User } from "../models/User.models.js";
-import { Profile } from '../models/Profile.models.js'
+import { Profile } from '../models/Profile.models.js';
 import { ErrorHandler } from "../utils/utility.js";
 import { compare } from "bcrypt";
 import { sendToken } from "../utils/features.js";
@@ -47,9 +47,13 @@ const loginUser = TryCatch(async (req, res, next) => {
 
     let user;
     if (emailOrUsername.includes('@')) {
-        user = await User.findOne({ email: emailOrUsername }).select("+password");
+        user = await User.findOne({ email: emailOrUsername }).select("+password").populate({
+            path: "profileDetails"
+        });
     } else {
-        user = await User.findOne({ userName: emailOrUsername }).select("+password");
+        user = await User.findOne({ userName: emailOrUsername }).select("+password").populate({
+            path: "profileDetails"
+        });;
     }
 
     if (!user) {
@@ -62,11 +66,30 @@ const loginUser = TryCatch(async (req, res, next) => {
         return next(new ErrorHandler("Invalid password", 400));
     }
 
+    // here i dont want to send password
+    user.password = ""
+
     sendToken(res, user, 200, `Welcome back ${user.userName}`);
 });
+
+const usernameCheck = TryCatch(async (req, res, next) => {
+    const { userName } = req.body;
+
+    const user = await User.findOne({ userName });
+    
+    if (user) {
+        return next(new ErrorHandler("Username is already exist", 400));
+    }
+
+    return res.status(200).json({
+        success: true,
+        message: "Username is available"
+    })
+})
 
 
 export {
     newUser,
-    loginUser
+    loginUser,
+    usernameCheck
 }

@@ -10,7 +10,7 @@
 
 import express from "express";
 import { isAuthenticated } from "../middlewares/auth.js";
-import { getMyProfile, updateProfile } from "../controllers/Profile.controller.js";
+import { getMyProfile, logout, updateProfile } from "../controllers/Profile.controller.js";
 import { updateProfileValidator, validateHandler } from "../lib/validators.js";
 
 const router = express.Router();
@@ -21,6 +21,7 @@ router.use(isAuthenticated);
 
 router.get("/my-profile", getMyProfile)
 router.post("/update-profile", updateProfileValidator(), validateHandler, updateProfile)
+router.get("/logout", logout)
 
 
 export default router;

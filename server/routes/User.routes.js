@@ -4,12 +4,13 @@
 */
 import express from "express";
 import { loginValidator, registerValidator, validateHandler } from "../lib/validators.js";
-import { loginUser, newUser } from "../controllers/User.controller.js";
+import { loginUser, newUser, usernameCheck } from "../controllers/User.controller.js";
 
 
 const router = express.Router();
 router.post("/new", registerValidator(), validateHandler, newUser);
-router.post("/login", loginValidator(), validateHandler, loginUser)
+router.post("/login", loginValidator(), validateHandler, loginUser);
+router.post("/username-check", validateHandler, usernameCheck);
 
 
 // TODO: Add routes for the following:

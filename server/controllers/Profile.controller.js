@@ -3,6 +3,8 @@ import { User } from "../models/User.models.js";
 import { Board } from "../models/Board.models.js"; // both are required for the controller to work, so dont remove
 import { Game } from "../models/Game.models.js"
 import { Profile } from "../models/Profile.models.js";
+import { BINGO_TOKEN } from "../constants/config.constants.js";
+import { cookieOptions } from "../utils/features.js";
 
 
 const getMyProfile = TryCatch(async (req, res, next) => {
@@ -62,9 +64,20 @@ const updateProfile = TryCatch(async (req, res, next) => {
 
 })
 
+const logout = TryCatch(async (req, res) => {
+    return res
+        .status(200)
+        .cookie(BINGO_TOKEN, "", { ...cookieOptions, maxAge: 0 })
+        .json({
+            success: true,
+            message: "Logged out successfully",
+        });
+});
+
 
 
 export {
     getMyProfile,
-    updateProfile
+    updateProfile,
+    logout
 }
