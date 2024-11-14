@@ -1,6 +1,6 @@
 import './App.css';
 import React, { Suspense, lazy, useEffect, useState, } from 'react';
-import { Routes, Route } from 'react-router-dom';
+import { Routes, Route, Navigate } from 'react-router-dom';
 import { DotLottieReact } from '@lottiefiles/dotlottie-react';
 import {
   Link, Button, useDisclosure,
@@ -17,6 +17,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { serverURL } from './constants/config';
 import { isLoadingAuth, userExists, userNotExists } from './redux/reducers/auth';
 import toast from 'react-hot-toast';
+import { SocketProvider } from './socket';
 
 const Home = lazy(() => import('./pages/Home'));
 const CreateBoard = lazy(() => import('./pages/CreateBoard'));
@@ -24,12 +25,31 @@ const NavBar = lazy(() => import('./components/common/NavBar'));
 const AllBoards = lazy(() => import('./pages/AllBoards'));
 const HowToPlay = lazy(() => import('./pages/HowToPlay'));
 const AboutUs = lazy(() => import('./pages/AboutUs'));
+const GameRoom = lazy(() => import('./pages/GameRoom'));
 
 const App = () => {
 
   const { user, loader } = useSelector((state) => state.auth);
+  const [isSignIn, setIsSignIn] = useState(true)
+  const [isVisible, setIsVisible] = useState(false);
+  const [isVisibleSUpPass, setIsVisibleSUpPass] = useState(false);
+  const [isVisibleSUpConfPass, setIsVisibleSUpConfPass] = useState(false);
+  const { player1, player2, myBoard, currentTurn } = useSelector((state) => state.gameRoom)
   const [isLoading, setIsLoading] = useState(false)
   const dispatch = useDispatch();
+
+  const {
+    register,
+    handleSubmit,
+    watch,
+    setValue,
+    getValues,
+    reset,
+    setError,
+    clearErrors,
+    formState: { errors },
+  } = useForm();
+  const username = watch('username');
 
   // Fetching the user data
   useEffect(() => {
@@ -50,34 +70,6 @@ const App = () => {
       dispatch(isLoadingAuth(false))
     }
   }, [])
-
-  const { onOpen } = useDisclosure();
-  const [isOpen, setIsOpen] = useState(false);
-  const handleOpenChange = (open) => {
-    setIsOpen(open);
-    if (!open) {
-      // This is effectively your onClose function
-      console.log("Modal is closing");
-      // Perform any other close actions here
-    }
-  };
-  // To close the modal from outside:
-  const closeModal = () => {
-    setIsOpen(false);
-  };
-
-  const {
-    register,
-    handleSubmit,
-    watch,
-    setValue,
-    getValues,
-    reset,
-    setError,
-    clearErrors,
-    formState: { errors },
-  } = useForm();
-  const username = watch('username');
 
   // Function to check username availability
   useEffect(() => {
@@ -107,19 +99,29 @@ const App = () => {
     return () => clearTimeout(timer); // Cleanup timer on unmount or input change
   }, [username, setError, clearErrors]);
 
-  const [isSignIn, setIsSignIn] = useState(true)
-  const [isVisible, setIsVisible] = useState(false);
-  const [isVisibleSUpPass, setIsVisibleSUpPass] = useState(false);
-  const [isVisibleSUpConfPass, setIsVisibleSUpConfPass] = useState(false);
+  const { onOpen } = useDisclosure();
+  const [isOpen, setIsOpen] = useState(false);
+  const handleOpenChange = (open) => {
+    setIsOpen(open);
+    if (!open) {
+      // This is effectively your onClose function
+      console.log("Modal is closing");
+      // Perform any other close actions here
+    }
+  };
+  // To close the modal from outside:
+  const closeModal = () => {
+    setIsOpen(false);
+  };
+
+
 
   const toggleVisibility = (setFunction, variable) => setFunction(!variable);
 
-
-
+  // Login Handler
   const loginHandler = async (data) => {
     const toastId = toast.loading("Signing In...");
     setIsLoading(true)
-
 
     //  Add API call to login
     const config = {
@@ -159,6 +161,7 @@ const App = () => {
 
   }
 
+  // Sign Up Handler
   const signUpHandler = async (data) => {
     const toastId = toast.loading("Signing Up...");
     setIsLoading(true)
@@ -171,7 +174,7 @@ const App = () => {
       });
       return;
     }
-    // TODO: Add API call to sign up
+    //  Add API call to sign up
     const config = {
       withCredentials: true,
       "Content-Type": "application/json",
@@ -193,6 +196,8 @@ const App = () => {
       toast.success(res.data.message, {
         id: toastId,
       });
+      reset()
+      setIsSignIn(true)
     } catch (error) {
       console.log("Signup error", error);
       toast.error(error?.response?.data?.message || "Something Went Wrong", {
@@ -201,8 +206,6 @@ const App = () => {
     } finally {
       setIsLoading(false);
       console.log("Sign up data", data);
-      reset()
-      setIsSignIn(true)
     }
   }
 
@@ -222,6 +225,7 @@ const App = () => {
           src="https://lottie.host/753b35a4-05c3-49ea-bc26-6e7b6832df98/54SX878Rgh.json"
           loop
           autoplay
+          className='minh-[92vh]'
         />
       }>
         <div className='dark:bg-slate-950 h-auto'>
@@ -245,6 +249,7 @@ const App = () => {
             />
             <Route
               element={
+
                 <ProtectRoute
                   user={user}
                   onOpen={onOpen}
@@ -255,9 +260,27 @@ const App = () => {
                 path="/create-board"
                 element={<CreateBoard />}
               />
+
               <Route
                 path="/all-boards"
-                element={<AllBoards />}
+                element={
+                  <SocketProvider>
+                    <AllBoards />
+                  </SocketProvider>
+                }
+              />
+
+              <Route
+                path='/game-room'
+                element={
+                  player1 && player2 && myBoard && currentTurn ? (
+                    <SocketProvider>
+                      <GameRoom />
+                    </SocketProvider>
+                  ) : (
+                    <Navigate to='/' />
+                  )
+                }
               />
             </Route>
 

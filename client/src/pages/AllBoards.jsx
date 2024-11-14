@@ -8,44 +8,71 @@ import { serverURL } from '../constants/config';
 import toast from 'react-hot-toast';
 import useDocumentTitle from '../hooks/useDocumentTitle';
 import { useNavigate } from 'react-router-dom';
+import { getSocket } from '../socket';
+import SearchOpponent from '../components/SearchOpponent';
+import { OPPONENT_FOUND, OPPONENT_LEFT_MATCH, OPPONENT_NOT_FOUND, SEARCH_FOR_AN_OPPONENT } from '../../../server/constants/events';
+import { useDispatch, useSelector } from 'react-redux';
+import { setCurrentTurn, setMyBoard, setPlayer1, setPlayer2 } from '../redux/reducers/gameRoom';
+import { ERROR_SAVING_GAME } from '../constants/events';
 
 const AllBoards = () => {
     useDocumentTitle("All Boards | Bingo");
 
-    // Dummy data for 5 boards, each with a 5x5 grid
-    const [board, setBoard] = useState([[]]);
-    const [openModal, setOpenModal] = useState(false);
+    const socket = getSocket();
+
+    const { user } = useSelector((state) => state.auth)
     const { isOpen, onOpen, onOpenChange } = useDisclosure();
+    const navigate = useNavigate();
+    const dispatch = useDispatch()
+
+
+    const [board, setBoard] = useState([[]]);
     const [boards, setBoards] = useState([]);
     const [isLoading, setIsLoading] = useState(false);
-    const navigate = useNavigate();
+    const [opponent, setOpponent] = useState(null);
 
-    useEffect(() => {
-        // Fetch all boards
-        const fetchBoards = async () => {
-            const toastId = toast.loading("Fetching all boards...");
-            setIsLoading(true);
-            try {
-                const res = await axios.get(`${serverURL}/api/v1/board/get-all-boards`,
-                    {
-                        withCredentials: true
-                    }
-                )
-                setBoards(res.data.boards);
-                console.log("All boards are", res.data.boards);
-                toast.success(res.data.message, {
-                    id: toastId,
-                });
-            } catch (error) {
-                console.log("All Boards error", error);
-                toast.error(error?.response?.data?.message || "Something Went Wrong", {
-                    id: toastId,
-                });
-            } finally {
-                toast.dismiss(toastId);
-                setIsLoading(false);
-            }
+    // setting for search modal
+    const [openSearchModal, setOpenSearchModal] = useState(false);
+    const handleOpenChange = (open) => {
+        setOpenSearchModal(open);
+        console.log("open", open);
+        if (!open) {
+            // This is effectively your onClose function
+            console.log("Modal is closing");
+            // Perform any other close actions here
         }
+    };
+    // To close the search modal from outside:
+    const closeModal = () => {
+        setOpenSearchModal(false);
+    };
+
+    // Fetch all boards
+    // Fetch all boards
+    const fetchBoards = async () => {
+        const toastId = toast.loading("Fetching all boards...");
+        setIsLoading(true);
+        try {
+            const res = await axios.get(`${serverURL}/api/v1/board/get-all-boards`,
+                {
+                    withCredentials: true
+                }
+            )
+            setBoards(res.data.boards);
+            toast.success(res.data.message, {
+                id: toastId,
+            });
+        } catch (error) {
+            console.log("All Boards error", error);
+            toast.error(error?.response?.data?.message || "Something Went Wrong", {
+                id: toastId,
+            });
+        } finally {
+            toast.dismiss(toastId);
+            setIsLoading(false);
+        }
+    }
+    useEffect(() => {
         fetchBoards()
     }, [])
 
@@ -54,6 +81,59 @@ const AllBoards = () => {
         onOpen()
     }
 
+    // to search for an opponent
+    const searchOpponentHandler = () => {
+        setOpenSearchModal(true)
+        // Emit an event to the server to search for an opponent
+        socket.emit(SEARCH_FOR_AN_OPPONENT, {
+            userID: user._id,
+            boardID: board._id
+        })
+    }
+
+    useEffect(() => {
+        // Listen for the opponent found event
+        socket.on(OPPONENT_FOUND, ({ currentPlayer, opponentPlayer, currentTurn }) => {
+            setOpponent(opponentPlayer.userDetail);
+
+            dispatch(setPlayer1(currentPlayer));
+            dispatch(setPlayer2(opponentPlayer));
+            dispatch(setMyBoard(board));
+            dispatch(setCurrentTurn(currentTurn));
+
+            // Navigate to the game room after 3 seconds
+            setTimeout(() => {
+                navigate('/game-room');
+            }, 4000); // 3000 milliseconds = 3 seconds
+        });
+
+        // Error saving game in the database
+        socket.on(ERROR_SAVING_GAME, ({ message }) => {
+            toast.error(message);
+            closeModal();
+            setOpponent(null);
+        });
+
+        // When the opponent is not found
+        socket.on(OPPONENT_NOT_FOUND, () => {
+            setOpponent(null);
+        });
+
+        // When the opponent leaves the match
+        socket.on(OPPONENT_LEFT_MATCH, () => {
+            closeModal();
+            toast.error("Opponent left the match");
+            setOpponent(null);
+        });
+
+        return () => {
+            socket.off(OPPONENT_FOUND);
+            socket.off(OPPONENT_NOT_FOUND);
+            socket.off(OPPONENT_LEFT_MATCH);
+            socket.off(ERROR_SAVING_GAME);
+        };
+    }, [socket, dispatch, user._id, board._id]);
+
     return (
         isLoading ? (
             <div>
@@ -61,21 +141,34 @@ const AllBoards = () => {
             </div>
         ) :
             <div className=" container mx-auto p-4">
+                <span>Your socketId is { socket.id}</span>
                 {
                     boards.length === 0 ? (
                         <div className='min-h-[90.2vh] flex flex-col justify-center items-center'>
                             <h1 className="text-yellow-500 text-2xl font-bold mb-6 text-center">No Boards found</h1>
-                            <Button
-                                variant='solid'
-                                color='primary'
-                                className='font-semibold'
-                                onPress={() => navigate('/create-board')}
-                            >
-                                Create your first Board
-                            </Button>
+                            <div className='flex flex-col gap-4'>
+                                <Button
+                                    variant='solid'
+                                    color='primary'
+                                    className='font-semibold'
+                                    onPress={() => navigate('/create-board')}
+                                >
+                                    Create your first Board
+                                </Button>
+                                <Button
+                                    variant='bordered'
+                                    color='primary'
+                                    className='font-semibold text-white'
+                                    isLoading={isLoading}
+                                    onPress={() => fetchBoards()}
+                                >
+                                    Try Again
+                                </Button>
+                            </div>
+
                         </div>
                     ) : (
-                            <div className='min-h-screen'>
+                        <div className='min-h-[90.2vh]'>
                             <h1 className="text-yellow-500 text-2xl font-bold mb-6 text-center">All Boards</h1>
                             <div className="flex flex-wrap items-center justify-center gap-6">
                                 {boards.map((board, index) => (
@@ -89,7 +182,7 @@ const AllBoards = () => {
                                         <Button
                                             variant='solid'
                                             className='font-semibold bg-yellow-300 text-black'
-                                            onPress={() => useBoardHandler(board.board)}
+                                            onPress={() => useBoardHandler(board)}
                                         >
                                             Use this Board
                                         </Button>
@@ -117,7 +210,7 @@ const AllBoards = () => {
                                             <p className='text-lg'>You have chosen the following board:</p>
                                             <Board
                                                 heading={`Chosen Board`}
-                                                board={board}
+                                                board={board.board}
                                                 handleInputChange={() => { }} // Disable modification
                                                 readOnly={true}
                                             />
@@ -128,7 +221,7 @@ const AllBoards = () => {
                                                 className='text-xl font-semibold w-full'
                                                 color='primary'
                                                 variant='shadow'
-                                                onClick={() => console.log(board)}
+                                                onClick={() => searchOpponentHandler()}
                                             >
                                                 Search for an opponent
                                             </Button>
@@ -159,6 +252,14 @@ const AllBoards = () => {
                         )}
                     </ModalContent>
                 </Modal>
+
+
+                {/* Modal for searching an opponent */}
+                <SearchOpponent
+                    isOpen={openSearchModal}
+                    onOpenChange={handleOpenChange}
+                    opponent={opponent}
+                />
             </div>
     );
 };

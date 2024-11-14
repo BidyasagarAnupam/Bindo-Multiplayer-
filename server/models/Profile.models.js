@@ -5,8 +5,7 @@ import mongoose, { Schema, model, Types } from "mongoose";
 const ProfileSchema = new Schema({
     displayName: {
         type: String,
-        // required: true,
-        unique: true,
+        unique: false,
     },
     friends: [{
         type: Types.ObjectId,

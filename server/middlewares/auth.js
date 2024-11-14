@@ -2,6 +2,7 @@ import jwt from "jsonwebtoken";
 import { ErrorHandler } from "../utils/utility.js";
 import { TryCatch } from "./tryCatch.js";
 import { BINGO_TOKEN } from "../constants/config.constants.js";
+import { User } from "../models/User.models.js";
 
 
 const isAuthenticated = TryCatch((req, res, next) => {
@@ -17,29 +18,31 @@ const isAuthenticated = TryCatch((req, res, next) => {
 });
 
 
-// const socketAuthenticator = async (err, socket, next) => {
-//   try {
-//     if (err) return next(err);
+const socketAuthenticator = async (err, socket, next) => {
+  try {
+    if (err) return next(err); 
 
-//     const authToken = socket.request.cookies[BINGO_TOKEN];
+    const authToken = socket.request.cookies[BINGO_TOKEN];
 
-//     if (!authToken)
-//       return next(new ErrorHandler("Please login to access this route", 401));
+    if (!authToken)
+      return next(new ErrorHandler("Please login to access this route", 401));
 
-//     const decodedData = jwt.verify(authToken, process.env.JWT_SECRET);
+    const decodedData = jwt.verify(authToken, process.env.JWT_SECRET);
 
-//     const user = await User.findById(decodedData._id);
+    const user = await User.findById(decodedData._id).populate({
+      path: "profileDetails"
+    });;
 
-//     if (!user)
-//       return next(new ErrorHandler("Please login to access this route", 401));
+    if (!user)
+      return next(new ErrorHandler("Please login to access this route", 401));
 
-//     socket.user = user;
+    socket.user = user;
 
-//     return next();
-//   } catch (error) {
-//     console.log(error);
-//     return next(new ErrorHandler("Please login to access this route", 401));
-//   }
-// };
+    return next();
+  } catch (error) {
+    console.log(error);
+    return next(new ErrorHandler("Please login to access this route", 401));
+  }
+};
 
-export { isAuthenticated };
+export { isAuthenticated, socketAuthenticator };

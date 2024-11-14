@@ -17,8 +17,8 @@ const GameSchema = new Schema({
     ],
     status: {
         type: String,
-        default: "pending",
-        enum: ["inProgress", "completed", "waiting"],
+        default: "inProgress",
+        enum: ["inProgress", "completed"],
     },
     boards: [
         {

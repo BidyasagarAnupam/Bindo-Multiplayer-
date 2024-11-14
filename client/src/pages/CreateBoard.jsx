@@ -108,7 +108,7 @@ const CreateBoard = () => {
 
 
   return (
-    <div className="h-[93.5vh]  flex flex-col items-center justify-center gap-6">
+    <div className="min-h-[93.5vh]  flex flex-col items-center justify-center gap-6">
       <Board heading='Create your BINGO board' board={board} handleInputChange={handleInputChange} readOnly={false} />
       <div className='flex flex-col gap-3 w-4/5 md:w-2/5 lg:w-2/6 xl:w-1/5 items-center justify-center'>
         <div className='flex gap-4 w-full'>

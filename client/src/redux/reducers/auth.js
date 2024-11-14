@@ -6,9 +6,9 @@ const initialState = {
     loader: true,
 };
 
-const authSclice = createSlice({
+const authSlice = createSlice({
     name: 'auth',
-    initialState : initialState,
+    initialState: initialState,
     reducers: {
         userExists: (state, action) => {
             state.user = action.payload;
@@ -24,5 +24,5 @@ const authSclice = createSlice({
     }
 })
 
-export default authSclice;
-export const { userExists, userNotExists, isLoadingAuth } = authSclice.actions;
+export default authSlice;
+export const { userExists, userNotExists, isLoadingAuth } = authSlice.actions;

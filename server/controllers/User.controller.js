@@ -9,6 +9,8 @@ import { sendToken } from "../utils/features.js";
 const newUser = TryCatch(async (req, res, next) => {
     const { userName, email, password } = req.body;
 
+    console.log("Idhar aaya");
+
     const existingUser = await User.findOne({ email });
 
     if (existingUser) {
@@ -17,11 +19,7 @@ const newUser = TryCatch(async (req, res, next) => {
 
     // create profileDetails
     const profileDetails = await Profile.create({
-        displayName: null,
-        gender: null,
-        dob: null,
         avatar: `https://api.dicebear.com/5.x/initials/svg?seed=${userName}`,
-
     });
 
     const user = await User.create({
