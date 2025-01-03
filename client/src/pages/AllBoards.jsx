@@ -10,10 +10,11 @@ import useDocumentTitle from '../hooks/useDocumentTitle';
 import { useNavigate } from 'react-router-dom';
 import { getSocket } from '../socket';
 import SearchOpponent from '../components/SearchOpponent';
-import { OPPONENT_FOUND, OPPONENT_LEFT_MATCH, OPPONENT_NOT_FOUND, SEARCH_FOR_AN_OPPONENT } from '../../../server/constants/events';
+import { OPPONENT_FOUND, OPPONENT_LEFT_MATCH_FROM_SERVER, OPPONENT_NOT_FOUND, SEARCH_FOR_AN_OPPONENT } from '../constants/events';
 import { useDispatch, useSelector } from 'react-redux';
 import { setCurrentTurn, setMyBoard, setPlayer1, setPlayer2 } from '../redux/reducers/gameRoom';
 import { ERROR_SAVING_GAME } from '../constants/events';
+import PlayWithFriend from '../components/PlayWithFriend';
 
 const AllBoards = () => {
     useDocumentTitle("All Boards | Bingo");
@@ -30,24 +31,37 @@ const AllBoards = () => {
     const [boards, setBoards] = useState([]);
     const [isLoading, setIsLoading] = useState(false);
     const [opponent, setOpponent] = useState(null);
+    const [openSearchModal, setOpenSearchModal] = useState(false);
+    const [openPlayWithFriendModal, setOpenPlayWithFriendModal] = useState(false);
 
     // setting for search modal
-    const [openSearchModal, setOpenSearchModal] = useState(false);
-    const handleOpenChange = (open) => {
+    const handleSearchModalOpenChange = (open) => {
         setOpenSearchModal(open);
         console.log("open", open);
         if (!open) {
             // This is effectively your onClose function
-            console.log("Modal is closing");
             // Perform any other close actions here
         }
     };
     // To close the search modal from outside:
-    const closeModal = () => {
+    const closeSearchModal = () => {
         setOpenSearchModal(false);
     };
+    
+    // setting for play with friend modal
+    const handlePlayWithFriendModalOpenChange = (open) => {
+        setOpenPlayWithFriendModal(open);
+        console.log("open", open);
+        if (!open) {
+            // This is effectively your onClose function
+            // Perform any other close actions here
+        }
+    };
+    // To close the  play with friend modal from outside:
+    const closePlayWithFriendModal = () => {
+        setOpenPlayWithFriendModal(false);
+    };
 
-    // Fetch all boards
     // Fetch all boards
     const fetchBoards = async () => {
         const toastId = toast.loading("Fetching all boards...");
@@ -91,26 +105,28 @@ const AllBoards = () => {
         })
     }
 
+    // Listen for the opponent found event
     useEffect(() => {
-        // Listen for the opponent found event
         socket.on(OPPONENT_FOUND, ({ currentPlayer, opponentPlayer, currentTurn }) => {
             setOpponent(opponentPlayer.userDetail);
-
+            console.log("AAYA OPPONENT_FOUND main");
             dispatch(setPlayer1(currentPlayer));
             dispatch(setPlayer2(opponentPlayer));
             dispatch(setMyBoard(board));
             dispatch(setCurrentTurn(currentTurn));
 
-            // Navigate to the game room after 3 seconds
+            // Navigate to the game room after 4 seconds
             setTimeout(() => {
+                closeSearchModal();
+                setOpenSearchModal(false);
                 navigate('/game-room');
-            }, 4000); // 3000 milliseconds = 3 seconds
+            }, 4000); // 4000 milliseconds = 4 seconds
         });
 
         // Error saving game in the database
         socket.on(ERROR_SAVING_GAME, ({ message }) => {
             toast.error(message);
-            closeModal();
+            closeSearchModal();
             setOpponent(null);
         });
 
@@ -120,8 +136,8 @@ const AllBoards = () => {
         });
 
         // When the opponent leaves the match
-        socket.on(OPPONENT_LEFT_MATCH, () => {
-            closeModal();
+        socket.on(OPPONENT_LEFT_MATCH_FROM_SERVER, () => {
+            closeSearchModal();
             toast.error("Opponent left the match");
             setOpponent(null);
         });
@@ -129,10 +145,16 @@ const AllBoards = () => {
         return () => {
             socket.off(OPPONENT_FOUND);
             socket.off(OPPONENT_NOT_FOUND);
-            socket.off(OPPONENT_LEFT_MATCH);
+            socket.off(OPPONENT_LEFT_MATCH_FROM_SERVER);
             socket.off(ERROR_SAVING_GAME);
         };
     }, [socket, dispatch, user._id, board._id]);
+
+
+    // Play with a friend
+    const playWithFriendHandler = () => {
+        setOpenPlayWithFriendModal(true)
+    }
 
     return (
         isLoading ? (
@@ -141,7 +163,6 @@ const AllBoards = () => {
             </div>
         ) :
             <div className=" container mx-auto p-4">
-                <span>Your socketId is { socket.id}</span>
                 {
                     boards.length === 0 ? (
                         <div className='min-h-[90.2vh] flex flex-col justify-center items-center'>
@@ -198,7 +219,11 @@ const AllBoards = () => {
                     isOpen={isOpen}
                     onOpenChange={onOpenChange}
                     className='dark text-foreground'
-                    size='5xl'
+                    size='4xl'
+                    scrollBehavior='inside'
+                    classNames={{
+                        wrapper: "[--slide-exit:0px]",
+                    }}
                 >
                     <ModalContent>
                         {(onClose) => (
@@ -216,9 +241,9 @@ const AllBoards = () => {
                                             />
                                         </div>
                                         <div className='w-full md:w-1/3 flex flex-col gap-3 items-center justify-center'>
-                                            <p className='text-2xl font-semibold'>Play Game using:</p>
+                                            <p className='text-xl md:text-2xl'>Play Game using :</p>
                                             <Button
-                                                className='text-xl font-semibold w-full'
+                                                className='text-medium md:font-semibold md:w-full'
                                                 color='primary'
                                                 variant='shadow'
                                                 onClick={() => searchOpponentHandler()}
@@ -233,11 +258,11 @@ const AllBoards = () => {
                                             </div>
 
                                             <Button
-                                                className='text-xl font-semibold text-black w-full bg-yellow-300'
+                                                className='text-medium md:font-semibold text-black md:w-full bg-yellow-300'
                                                 variant='shadow'
-                                                onClick={() => console.log("ok")}
+                                                onClick={() => playWithFriendHandler()}
                                             >
-                                                Invite a friend
+                                                Play with a friend
                                             </Button>
                                         </div>
                                     </div>
@@ -255,11 +280,29 @@ const AllBoards = () => {
 
 
                 {/* Modal for searching an opponent */}
-                <SearchOpponent
-                    isOpen={openSearchModal}
-                    onOpenChange={handleOpenChange}
-                    opponent={opponent}
-                />
+                {
+                    openSearchModal && (
+                        <SearchOpponent
+                            isOpen={openSearchModal}
+                            onOpenChange={handleSearchModalOpenChange}
+                            opponent={opponent}
+                        />
+                    )
+                }
+
+                {/* Modal for Play with friend */}
+                {
+                    openPlayWithFriendModal && (
+                        <PlayWithFriend 
+                            boardID={board._id}
+                            isOpen={openPlayWithFriendModal}
+                            onOpenChange={handlePlayWithFriendModalOpenChange}
+                            setOpenSearchModal={setOpenSearchModal}
+                            closePlayWithFriendModal={closePlayWithFriendModal}
+                        />
+                    )
+                }
+
             </div>
     );
 };

@@ -59,6 +59,7 @@ const App = () => {
         const data = await axios.get(`${serverURL}/api/v1/profile/my-profile`, { withCredentials: true })
         console.log("DATA", data);
         dispatch(userExists(data.user))
+        localStorage.removeItem("user");
       } catch (error) {
         dispatch(userNotExists())
       }
