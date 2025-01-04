@@ -210,9 +210,6 @@ const App = () => {
     }
   }
 
-  // Dummy user
-  // const user = false;
-
   return loader ? (
     <DotLottieReact
       src="https://lottie.host/753b35a4-05c3-49ea-bc26-6e7b6832df98/54SX878Rgh.json"

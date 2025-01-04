@@ -12,7 +12,7 @@ import { getSocket } from '../socket';
 import SearchOpponent from '../components/SearchOpponent';
 import { OPPONENT_FOUND, OPPONENT_LEFT_MATCH_FROM_SERVER, OPPONENT_NOT_FOUND, SEARCH_FOR_AN_OPPONENT } from '../constants/events';
 import { useDispatch, useSelector } from 'react-redux';
-import { setCurrentTurn, setMyBoard, setPlayer1, setPlayer2 } from '../redux/reducers/gameRoom';
+import { resetGameRoom, setCurrentTurn, setMyBoard, setPlayer1, setPlayer2 } from '../redux/reducers/gameRoom';
 import { ERROR_SAVING_GAME } from '../constants/events';
 import PlayWithFriend from '../components/PlayWithFriend';
 
@@ -139,6 +139,10 @@ const AllBoards = () => {
         socket.on(OPPONENT_LEFT_MATCH_FROM_SERVER, () => {
             closeSearchModal();
             toast.error("Opponent left the match");
+            //  Reset the game room state and prevent to navigate to the game room
+            dispatch(resetGameRoom())
+            // prevent to navigate to the game room
+            navigate('/');
             setOpponent(null);
         });
 

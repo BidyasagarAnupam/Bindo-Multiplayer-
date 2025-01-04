@@ -4,7 +4,7 @@ import useDocumentTitle from '../hooks/useDocumentTitle';
 import { getSocket } from '../socket';
 import cutIcon from '../assets/cut.svg';
 import { CLICKED_ON_CELL_FROM_CLIENT, CLICKED_ON_CELL_FROM_SERVER, OPPONENT_LEFT_MATCH_FROM_SERVER, PLAYER_ACCEPT_FOR_REMATCH_FROM_CLIENT, PLAYER_ACCEPT_FOR_REMATCH_FROM_SERVER, PLAYER_DONT_WANT_TO_PLAY_AGAIN_FROM_CLIENT, PLAYER_DONT_WANT_TO_PLAY_AGAIN_FROM_SERVER, PLAYER_LEFT_MATCH_FROM_CLIENT, PLAYER_WANT_TO_PLAY_AGAIN_FROM_CLIENT, PLAYER_WANT_TO_PLAY_AGAIN_FROM_SERVER, WINNER_NOTIFICATION_FROM_CLIENT, WINNER_NOTIFICATION_FROM_SERVER } from '../constants/events';
-import { setCurrentTurn } from '../redux/reducers/gameRoom';
+import { resetGameRoom, setCurrentTurn } from '../redux/reducers/gameRoom';
 import { checkWinningCondition } from '../helper/functions';
 import { Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Avatar, Button, Tooltip } from "@nextui-org/react";
 import WINNERGIF from '../assets/winner.gif';
@@ -15,6 +15,7 @@ import { HiCheckCircle, HiOutlineHome, HiOutlineRefresh } from "react-icons/hi";
 import { useNavigate } from 'react-router-dom';
 import toast from 'react-hot-toast';
 import { IoSettings, IoExitOutline } from "react-icons/io5";
+import { FaInfoCircle } from "react-icons/fa";
 
 const GameRoom = () => {
   useDocumentTitle("Playing Mode | Bingo");
@@ -169,6 +170,7 @@ const GameRoom = () => {
     // emit an event that the player1 don't want to play again
     socket.emit(PLAYER_DONT_WANT_TO_PLAY_AGAIN_FROM_CLIENT, { player1, player2 });
     navigate('/')
+    dispatch(resetGameRoom())
   }
 
   // Listen for the player don't want to play again
@@ -221,6 +223,7 @@ const GameRoom = () => {
   useEffect(() => {
     const handlePlayerAcceptForRematch = ({ currentTurn }) => {
       setRequestAccepted(true);
+      console.log("Your socket Id ", socket.id);
 
       setTimeout(() => {
         resetGame(currentTurn);
@@ -278,6 +281,12 @@ const GameRoom = () => {
     setPlayerWantToLeft(true);
     toast.error("You left the match")
     socket.emit(PLAYER_LEFT_MATCH_FROM_CLIENT, { socketId: socket.id });
+    dispatch(resetGameRoom())
+    navigate('/')
+  }
+
+  const goToHomePage = () => {
+    dispatch(resetGameRoom())
     navigate('/')
   }
 
@@ -467,13 +476,13 @@ const GameRoom = () => {
                       (!requestAccepted && (!requestingForPlayAgain || isPlayerDontWantToPLayAgain)) &&
                       (<Button
                         onPress={() => {
-                          !isPlayerDontWantToPLayAgain ? handleHomeButton() : navigate('/')
+                          !isPlayerDontWantToPLayAgain ? handleHomeButton() : goToHomePage()
                         }}
                         color='danger'
                         className='font-semibold'
                         endContent={<HiOutlineHome size='20px'
                         />}>
-                        Home
+                        Home...
                       </Button>)
                     }
 
@@ -536,9 +545,20 @@ const GameRoom = () => {
                 {/* Volume bar */}
                 {/* Leave the Match */}
                 <div className='flex justify-between items-center'>
-                  <p className='text-sm'>Want to leave the game ?</p>
+                  <div className='flex gap-1'>
+                    <p className='text-sm'>Want to leave the game ?</p>
+                    <Tooltip
+                      content="If you leave the match, you will lose the game."
+                      placement="top"
+                      color='danger'
+                      
+                    >
+                      <div className='cursor-pointer'>
+                        <FaInfoCircle />
+                      </div>
+                    </Tooltip>
+                  </div>
                   <IoExitOutline size="25px" className='text-red-600 cursor-pointer'
-
                     onClick={() => {
                       handleLeaveMatch()
                     }}

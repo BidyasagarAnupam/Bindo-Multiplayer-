@@ -24,9 +24,16 @@ const gameRoomSlice = createSlice({
         },
         setCurrentTurn: (state, action) => {
             state.currentTurn = action.payload;
-        }
+        },
+        resetGameRoom: (state) => {
+            state.player1 = null;
+            state.player2 = null;
+            state.myBoard = null;
+            state.currentTurn = null;
+
+        },
     }
 })
 
 export default gameRoomSlice;
-export const { setPlayer1, setPlayer2, setMyBoard, setCurrentTurn } = gameRoomSlice.actions;
+export const { setPlayer1, setPlayer2, setMyBoard, setCurrentTurn, resetGameRoom } = gameRoomSlice.actions;
