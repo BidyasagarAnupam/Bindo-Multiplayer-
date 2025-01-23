@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react'
-import { Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Button, useDisclosure, Divider, Input } from "@nextui-org/react";
+import { Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Button, useDisclosure, Divider, Input } from "@heroui/react";
 import toast from 'react-hot-toast';
 import { CREATE_ROOM, DESTROY_ROOM, JOIN_ROOM, OPPONENT_FOUND } from '../constants/events';
 import { getSocket } from '../socket';

@@ -4,7 +4,7 @@ import { Board } from "../models/Board.models.js"; // both are required for the 
 import { Game } from "../models/Game.models.js"
 import { Profile } from "../models/Profile.models.js";
 import { BINGO_TOKEN } from "../constants/config.constants.js";
-import { cookieOptions } from "../utils/features.js";
+import { cookieOptions, uploadImageToCloudinary } from "../utils/features.js";
 
 
 const getMyProfile = TryCatch(async (req, res, next) => {
@@ -64,6 +64,49 @@ const updateProfile = TryCatch(async (req, res, next) => {
 
 })
 
+const updateProfilePicture = TryCatch(async (req, res, next) => {
+    const userId = req.userId;
+    const profilePicture = req.files?.profilePicture
+
+    console.log("Profile Picture ", req?.files?.profilePicture);
+
+    let user = await User.findById(userId);
+
+    if (!user) return next(new ErrorHandler("User not found", 404));
+
+    const profileId = user.profileDetails
+
+    let profileDetails = await Profile.findById(profileId);
+
+    if (!profileDetails) return next(new ErrorHandler("Profile details not found", 404));
+
+    const image = await uploadImageToCloudinary(
+        profilePicture,
+        process.env.FOLDER_NAME,
+        1000,
+        1000
+    )
+
+    profileDetails.avatar = image.secure_url
+
+    await profileDetails.save();
+
+    user = await User.findById(userId).populate({
+        path: "profileDetails"
+    }).populate({
+        path: "allBoards"
+    }).populate({
+        path: "allGames"
+    }).exec();
+
+    return res.status(200).json({
+        success: true,
+        user,
+        message: "Profile Picture updated Successful"
+    });
+
+})
+
 const logout = TryCatch(async (req, res) => {
     return res
         .status(200)
@@ -79,5 +122,6 @@ const logout = TryCatch(async (req, res) => {
 export {
     getMyProfile,
     updateProfile,
+    updateProfilePicture,
     logout
 }

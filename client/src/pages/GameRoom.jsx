@@ -6,7 +6,7 @@ import cutIcon from '../assets/cut.svg';
 import { CLICKED_ON_CELL_FROM_CLIENT, CLICKED_ON_CELL_FROM_SERVER, OPPONENT_LEFT_MATCH_FROM_SERVER, PLAYER_ACCEPT_FOR_REMATCH_FROM_CLIENT, PLAYER_ACCEPT_FOR_REMATCH_FROM_SERVER, PLAYER_DONT_WANT_TO_PLAY_AGAIN_FROM_CLIENT, PLAYER_DONT_WANT_TO_PLAY_AGAIN_FROM_SERVER, PLAYER_LEFT_MATCH_FROM_CLIENT, PLAYER_WANT_TO_PLAY_AGAIN_FROM_CLIENT, PLAYER_WANT_TO_PLAY_AGAIN_FROM_SERVER, WINNER_NOTIFICATION_FROM_CLIENT, WINNER_NOTIFICATION_FROM_SERVER } from '../constants/events';
 import { resetGameRoom, setCurrentTurn } from '../redux/reducers/gameRoom';
 import { checkWinningCondition } from '../helper/functions';
-import { Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Avatar, Button, Tooltip } from "@nextui-org/react";
+import { Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Avatar, Button, Tooltip } from "@heroui/react";
 import WINNERGIF from '../assets/winner.gif';
 import LOSERGIF from '../assets/loser.gif';
 import YOURTURNGIF from '../assets/yourTurn.gif';

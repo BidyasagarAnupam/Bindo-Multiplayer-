@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react'
 import useDocumentTitle from "../hooks/useDocumentTitle";
 import { toast } from "react-hot-toast";
 import '../App.css'
-import { Button, Divider } from "@nextui-org/react";
+import { Button, Divider } from "@heroui/react";
 import Board from '../components/common/Board';
 import axios from "axios";
 import { useNavigate } from 'react-router-dom';
@@ -45,9 +45,6 @@ const CreateBoard = () => {
     }
   };
 
-  useEffect(() => {
-    // console.log("board", board);
-  }, [board])
 
   const generateRandomBoard = () => {
     const numbers = Array.from({ length: 25 }, (_, i) => i + 1); // Generate numbers 1-25

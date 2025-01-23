@@ -45,10 +45,11 @@ const updateProfileValidator = () => [
         .withMessage("gender can't be empty"),
     body("dob", "Please enter your dob")
         .notEmpty()
-        .isDate()
+        // .isDate()
     .withMessage("DOB should be a date"),
-
 ];
+
+
 const createBoardValidator = () => [
     body("board", "Please provide a 5x5 board")
         .isArray({ min: 5, max: 5 })
@@ -77,5 +78,5 @@ export {
     registerValidator,
     loginValidator,
     updateProfileValidator,
-    createBoardValidator
+    createBoardValidator,
 }

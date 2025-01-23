@@ -5,7 +5,7 @@ import { createServer } from "http";
 import { Server } from "socket.io";
 import cookieParser from "cookie-parser";
 import cors from "cors";
-
+import fileUpload from "express-fileupload";
 
 import userRoute from './routes/User.routes.js';
 import profileRoute from "./routes/Profile.routes.js";
@@ -14,6 +14,7 @@ import { errorMiddleware } from "./middlewares/tryCatch.js";
 import { corsOptions } from "./constants/config.constants.js";
 import { socketAuthenticator } from "./middlewares/auth.js";
 import { CLICKED_ON_CELL_FROM_CLIENT, CLICKED_ON_CELL_FROM_SERVER, CREATE_ROOM, DESTROY_ROOM, ERROR_SAVING_GAME, JOIN_ROOM, OPPONENT_FOUND, OPPONENT_LEFT_MATCH_FROM_SERVER, OPPONENT_NOT_FOUND, PLAYER_ACCEPT_FOR_REMATCH_FROM_CLIENT, PLAYER_ACCEPT_FOR_REMATCH_FROM_SERVER, PLAYER_DONT_WANT_TO_PLAY_AGAIN_FROM_CLIENT, PLAYER_DONT_WANT_TO_PLAY_AGAIN_FROM_SERVER, PLAYER_LEFT_MATCH_FROM_CLIENT, PLAYER_WANT_TO_PLAY_AGAIN_FROM_CLIENT, PLAYER_WANT_TO_PLAY_AGAIN_FROM_SERVER, ROOM_READY, SEARCH_FOR_AN_OPPONENT, WINNER_NOTIFICATION_FROM_CLIENT, WINNER_NOTIFICATION_FROM_SERVER } from "./constants/events.js";
+import { cloudinaryConnect } from "./config/cloudinary.js";
 
 // Constants from .env
 const PORT = process.env.PORT || 3000;
@@ -41,6 +42,14 @@ app.use(express.json());
 app.use(cookieParser());
 app.use(cors(corsOptions));
 app.use(express.urlencoded({ extended: true }));
+app.use(
+    fileUpload({
+        useTempFiles: true,
+        tempFileDir: "/tmp",
+    })
+)
+
+cloudinaryConnect()
 
 // mounting routes
 app.use("/api/v1/user", userRoute)

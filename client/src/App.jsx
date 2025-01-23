@@ -5,7 +5,7 @@ import { DotLottieReact } from '@lottiefiles/dotlottie-react';
 import {
   Link, Button, useDisclosure,
   Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Checkbox, Input
-} from "@nextui-org/react";
+} from "@heroui/react";
 import { MailIcon } from "./components/common/icons/MailIcon";
 import { EyeSlashFilledIcon } from './components/common/icons/EyeSlashFilledIcon';
 import { EyeFilledIcon } from './components/common/icons/EyeFilledIcon';
@@ -18,6 +18,7 @@ import { serverURL } from './constants/config';
 import { isLoadingAuth, userExists, userNotExists } from './redux/reducers/auth';
 import toast from 'react-hot-toast';
 import { SocketProvider } from './socket';
+import 'react-image-crop/dist/ReactCrop.css'
 
 const Home = lazy(() => import('./pages/Home'));
 const CreateBoard = lazy(() => import('./pages/CreateBoard'));
@@ -26,6 +27,13 @@ const AllBoards = lazy(() => import('./pages/AllBoards'));
 const HowToPlay = lazy(() => import('./pages/HowToPlay'));
 const AboutUs = lazy(() => import('./pages/AboutUs'));
 const GameRoom = lazy(() => import('./pages/GameRoom'));
+const Account = lazy(() => import('./pages/Account'));
+
+const Profile = lazy(() => import('./components/Account/Profile'));
+const Settings = lazy(() => import('./components/Account/Settings'));
+const Statistic = lazy(() => import('./components/Account/Statistic'));
+const GameHistory = lazy(() => import('./components/Account/GameHistory'));
+const Friends = lazy(() => import('./components/Account/Friends'));
 
 const App = () => {
 
@@ -224,7 +232,7 @@ const App = () => {
           loop
           autoplay
           className='minh-[92vh]'
-        />
+          />
       }>
         <div className='dark:bg-slate-950 h-auto'>
           <NavBar
@@ -279,13 +287,24 @@ const App = () => {
                     <Navigate to='/' />
                   )
                 }
-              />
+                />
+                
+                <Route
+                element={<Account />}
+                >
+                  <Route path='/account/profile' element={<Profile/>} />
+                  <Route path='/account/settings' element={<Settings/>}/>
+                  <Route path='/account/statistics' element={<Statistic/>}/>
+                  <Route path='/account/game-history' element={<GameHistory/>}/>
+                  <Route path='/account/friends' element={<Friends/>}/>
+                </Route>
             </Route>
-
+            
+              <Route path='*' element={<Navigate to='/' />} />
           </Routes>
         </div>
       </Suspense>
-      {/* Modal */}
+      {/* Login and Signup Modal */}
       <Modal
         isDismissable={false}
         className='dark text-foreground'

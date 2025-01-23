@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react'
-import { Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Button, Avatar, CircularProgress } from "@nextui-org/react"
+import { Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Button, Avatar, CircularProgress } from "@heroui/react"
 import { useSelector } from 'react-redux'
 import SearchGif from '../assets/searching.gif'
 import VsGif from '../assets/vs.gif'

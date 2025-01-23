@@ -1,7 +1,7 @@
 import jwt from "jsonwebtoken";
 import { BINGO_TOKEN } from "../constants/config.constants.js";
 // import { v4 as uuid } from "uuid";
-// import { v2 as cloudinary } from "cloudinary";
+import { v2 as cloudinary } from "cloudinary";
 // import { getBase64, getSockets } from "../lib/helper.js";
 
 const cookieOptions = {
@@ -32,40 +32,23 @@ const sendToken = (res, user, code, message) => {
 //   io.to(usersSocket).emit(event, data);
 // };
 
-// const uploadFilesToCloudinary = async (files = []) => {
-//   const uploadPromises = files.map((file) => {
-//     return new Promise((resolve, reject) => {
-//       cloudinary.uploader.upload(
-//         getBase64(file),
-//         {
-//           resource_type: "auto",
-//           public_id: uuid(),
-//         },
-//         (error, result) => {
-//           if (error) return reject(error);
-//           resolve(result);
-//         }
-//       );
-//     });
-//   });
+const uploadImageToCloudinary = async (file, folder, height, quality) => {
+  const options = { folder };
+  if (height) {
+    options.height = height;
+  }
+  if (quality) {
+    options.quality = quality;
+  }
+  options.resource_type = "auto";
 
-//   try {
-//     const results = await Promise.all(uploadPromises);
-
-//     const formattedResults = results.map((result) => ({
-//       public_id: result.public_id,
-//       url: result.secure_url,
-//     }));
-//     return formattedResults;
-//   } catch (err) {
-//     throw new Error("Error uploading files to cloudinary", err);
-//   }
-// };
+  return await cloudinary.uploader.upload(file.tempFilePath, options);
+}
 
 
 export {
   sendToken,
   cookieOptions,
   // emitEvent,
-  // uploadFilesToCloudinary,
+  uploadImageToCloudinary,
 };

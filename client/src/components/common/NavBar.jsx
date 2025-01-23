@@ -9,30 +9,37 @@ import {
     NavbarMenuItem,
     Link,
     Button
-} from "@nextui-org/react";
+} from "@heroui/react";
 import { NavbarLinks } from "../../data/navbar-links";
-import { matchPath, useLocation } from 'react-router-dom';
+import { matchPath, useLocation, useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
-import { Avatar } from "@nextui-org/react";
+import { Avatar } from "@heroui/react";
 import {
     Dropdown,
     DropdownTrigger,
     DropdownMenu,
     DropdownSection,
     DropdownItem
-} from "@nextui-org/dropdown";
+} from "@heroui/dropdown";
 import { serverURL } from '../../constants/config';
 import { userNotExists } from '../../redux/reducers/auth';
 import toast from 'react-hot-toast';
 import axios from 'axios';
+import { BiSolidUserAccount } from "react-icons/bi";
+import { IoSettings, IoLogOut } from "react-icons/io5";
+import CoinIcon from '../../assets/coin.png'
 
 const NavBar = ({
     setIsSignIn,
     setIsOpen
 }) => {
-
+    const [isMenuOpen, setIsMenuOpen] = useState(false);
     const { user } = useSelector((state) => state.auth)
+
+
     const dispatch = useDispatch()
+    const location = useLocation()
+    const navigate = useNavigate()
 
     const handleLogin = () => {
         setIsSignIn(true)
@@ -48,10 +55,8 @@ const NavBar = ({
         return matchPath({ path: route }, location.pathname);
     }
 
-    const location = useLocation()
-    const [isMenuOpen, setIsMenuOpen] = useState(false);
 
-    const logoutHandler = async () => { 
+    const logoutHandler = async () => {
         try {
             const { data } = await axios.get(`${serverURL}/api/v1/profile/logout`, {
                 withCredentials: true,
@@ -83,7 +88,7 @@ const NavBar = ({
                 <NavbarContent className="hidden sm:flex gap-4" justify="center">
                     {
                         NavbarLinks.map((item, index) => {
-                            if(!user && item.auth) return null
+                            if (!user && item.auth) return null
                             return (
                                 <NavbarItem key={`${item.id}`}>
                                     <Link color="foreground" href={`${item.path}`} className='flex flex-col'>
@@ -110,6 +115,16 @@ const NavBar = ({
                     </NavbarContent>
                         : (
                             <NavbarContent justify="end">
+                                <div className='flex items-center gap-1 flex-row-reverse'>
+                                    <img 
+                                        src={`${CoinIcon}`}
+                                        alt="coin"
+                                        className='w-8 h-8'
+                                    />
+                                    {
+                                        <p className='font-semibold'>{user.profileDetails.coins}</p>
+                                    }
+                                </div>
                                 <Dropdown placement='bottom-start'>
                                     <DropdownTrigger>
                                         <Avatar
@@ -119,14 +134,39 @@ const NavBar = ({
                                     </DropdownTrigger>
                                     <DropdownMenu aria-label="Static Actions">
                                         <DropdownSection>
-                                            <DropdownItem key="profile">
+                                            <DropdownItem key="userName" textValue='...'>
                                                 <p className="font-medium text-medium">@{user?.userName}</p>
                                             </DropdownItem>
                                         </DropdownSection>
-                                        <DropdownItem key="new">Profile</DropdownItem>
-                                        <DropdownItem key="edit">Setting</DropdownItem>
-                                        <DropdownItem key="delete" className="text-danger" color="danger"
-                                        onClick={() => logoutHandler()}
+                                        <DropdownItem
+                                            key="account"
+                                            
+                                            endContent={<BiSolidUserAccount className='text-xl' />}
+                                            onClick={() => {
+                                                setTimeout(() => {
+                                                    navigate('/account/profile');
+                                                }, 100); // Adjust the delay as needed
+                                            }}
+                                        >
+                                            Account
+                                        </DropdownItem>
+                                        <DropdownItem
+                                            key="edit"
+                                            endContent={<IoSettings className='text-xl' />}
+                                            onClick={() => {
+                                                setTimeout(() => {
+                                                    navigate('/account/settings');
+                                                }, 100); // Adjust the delay as needed
+                                            }}
+                                        >
+                                            Settings
+                                        </DropdownItem>
+                                        <DropdownItem
+                                            key="delete"
+                                            className="text-danger"
+                                            color="danger"
+                                            endContent={<IoLogOut className='text-xl' />}
+                                            onClick={() => logoutHandler()}
                                         >
                                             Logout
                                         </DropdownItem>
@@ -139,7 +179,7 @@ const NavBar = ({
 
                 <NavbarMenu className='dark text-foreground bg-slate-950'>
                     {NavbarLinks.map((item, index) => {
-                        if(!user && item.auth) return null
+                        if (!user && item.auth) return null
                         return (
                             <NavbarMenuItem key={`${item}-${index}`} >
                                 <Link color="foreground" href={`${item.path}`} className='flex flex-col'>

@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import Board from '../components/common/Board';
-import { Button } from "@nextui-org/button";
-import { Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, useDisclosure } from "@nextui-org/modal";
-import { Divider } from '@nextui-org/react';
+import { Button } from "@heroui/button";
+import { Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, useDisclosure } from "@heroui/modal";
+import { Divider } from "@heroui/react";
 import axios from "axios";
 import { serverURL } from '../constants/config';
 import toast from 'react-hot-toast';
