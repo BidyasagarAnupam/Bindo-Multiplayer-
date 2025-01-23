@@ -94,7 +94,7 @@ Welcome to the Bingo Game! This is a web-based multiplayer game where players ca
 ![Gameplay](./screenshots/gameRoom.png)
 
 ### Gameplay
-![Gameplay](./screenshots/gameplay.png)
+![Gameplay](./screenshots/gamePlay.png)
 
 ### Winner Page
 ![Gameplay](./screenshots/winnerPage.png)
