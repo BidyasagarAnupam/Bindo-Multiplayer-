@@ -4,7 +4,7 @@ import useDocumentTitle from '../hooks/useDocumentTitle';
 import { getSocket } from '../socket';
 import cutIcon from '../assets/cut.svg';
 import { CLICKED_ON_CELL_FROM_CLIENT, CLICKED_ON_CELL_FROM_SERVER, OPPONENT_LEFT_MATCH_FROM_SERVER, PLAYER_ACCEPT_FOR_REMATCH_FROM_CLIENT, PLAYER_ACCEPT_FOR_REMATCH_FROM_SERVER, PLAYER_DONT_WANT_TO_PLAY_AGAIN_FROM_CLIENT, PLAYER_DONT_WANT_TO_PLAY_AGAIN_FROM_SERVER, PLAYER_LEFT_MATCH_FROM_CLIENT, PLAYER_WANT_TO_PLAY_AGAIN_FROM_CLIENT, PLAYER_WANT_TO_PLAY_AGAIN_FROM_SERVER, WINNER_NOTIFICATION_FROM_CLIENT, WINNER_NOTIFICATION_FROM_SERVER } from '../constants/events';
-import { resetGameRoom, setCurrentTurn } from '../redux/reducers/gameRoom';
+import { resetGameRoom, setCurrentTurn, setGameId } from '../redux/reducers/gameRoom';
 import { checkWinningCondition } from '../helper/functions';
 import { Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Avatar, Button, Tooltip } from "@heroui/react";
 import WINNERGIF from '../assets/winner.gif';
@@ -16,11 +16,14 @@ import { useNavigate } from 'react-router-dom';
 import toast from 'react-hot-toast';
 import { IoSettings, IoExitOutline } from "react-icons/io5";
 import { FaInfoCircle } from "react-icons/fa";
+import { userExists } from '../redux/reducers/auth';
+import { setPlayer1, setPlayer2 } from '../redux/reducers/gameRoom';
 
 const GameRoom = () => {
   useDocumentTitle("Playing Mode | Bingo");
   const socket = getSocket();
 
+  const gameId = useSelector((state) => state.gameRoom.gameId);
 
   const { player1, player2, myBoard, currentTurn } = useSelector((state) => state.gameRoom);
   const [isCursorActive, setIsCursorActive] = useState(false);
@@ -140,15 +143,18 @@ const GameRoom = () => {
   useEffect(() => {
     if (winningLettersArray.length === 5) {
       // emit event to the server
-      socket.emit(WINNER_NOTIFICATION_FROM_CLIENT, { winner: player1, looser: player2 })
+      socket.emit(WINNER_NOTIFICATION_FROM_CLIENT, { winner: player1, looser: player2, gameId })
     }
   }, [winningLettersArray])
 
   // Listen for the winning notification from the server
   useEffect(() => {
-    const handleWinnerNotification = ({ status }) => {
+    const handleWinnerNotification = ({ status, userDetail }) => {
       if (status === "WON") {
         setGameStatus("WON");
+        //currentPlayer is now updated so we have to save in redux as well as in local storage
+        dispatch(userExists(userDetail));
+        localStorage.setItem("user", JSON.stringify(userDetail))
       } else {
         setGameStatus("LOST");
       }
@@ -221,12 +227,20 @@ const GameRoom = () => {
 
   // Listen for the player accept for rematch
   useEffect(() => {
-    const handlePlayerAcceptForRematch = ({ currentTurn }) => {
+    const handlePlayerAcceptForRematch = ({ currentTurn, currentPlayer, opponentPlayer, gameId }) => {
       setRequestAccepted(true);
       console.log("Your socket Id ", socket.id);
 
       setTimeout(() => {
         resetGame(currentTurn);
+        //currentPlayer is now updated so we have to save in redux as well as in local storage
+        dispatch(userExists(currentPlayer.userDetail));
+        localStorage.setItem("user", JSON.stringify(currentPlayer.userDetail))
+
+        dispatch(setPlayer1(currentPlayer));
+        dispatch(setPlayer2(opponentPlayer));
+        dispatch(setGameId(gameId));
+        localStorage.setItem('gameId', gameId);
         closeWinningModal();
       }, 2000);
 
@@ -258,11 +272,13 @@ const GameRoom = () => {
 
   // Listen for the opponent left the match
   useEffect(() => {
-    const handleOpponentLeftTheGame = ({ winner }) => {
+    const handleOpponentLeftTheGame = ({ winner, updatedUserDetails }) => {
       console.log("Winner is ", winner);
+      dispatch(userExists(updatedUserDetails));
+      localStorage.setItem("user", JSON.stringify(updatedUserDetails))
       setGameStatus("WON");
       setIsOpponentLeft(true);
-      toast.error(`Opponent left the game and winner is ${winner}`)
+      toast.success(`Opponent left the game and winner is ${winner}`)
       setTimeout(() => {
         setopenWinningModal(true);
       }, 1000);
@@ -280,7 +296,7 @@ const GameRoom = () => {
   const handleLeaveMatch = () => {
     setPlayerWantToLeft(true);
     toast.error("You left the match")
-    socket.emit(PLAYER_LEFT_MATCH_FROM_CLIENT, { socketId: socket.id });
+    socket.emit(PLAYER_LEFT_MATCH_FROM_CLIENT, { socketId: socket.id, gameId });
     dispatch(resetGameRoom())
     navigate('/')
   }
@@ -551,7 +567,7 @@ const GameRoom = () => {
                       content="If you leave the match, you will lose the game."
                       placement="top"
                       color='danger'
-                      
+
                     >
                       <div className='cursor-pointer'>
                         <FaInfoCircle />

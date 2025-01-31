@@ -10,7 +10,7 @@ import toast from 'react-hot-toast'
 const SearchOpponent = ({ isOpen, onOpenChange, opponent }) => {
   const { user } = useSelector((state) => state.auth)
   const [seconds, setSeconds] = useState(3)
-  const [timeRemaining, setTimeRemaining] = useState(20)
+  const [timeRemaining, setTimeRemaining] = useState(30)
 
   const socket = getSocket();
 
@@ -132,7 +132,7 @@ const SearchOpponent = ({ isOpen, onOpenChange, opponent }) => {
                         }}
                         aria-label="Loading..."
                         value={timeRemaining}
-                        maxValue={20}
+                        maxValue={30}
                         strokeWidth={3}
                         formatOptions={{ style: 'unit', unit: 'second' }}
                         showValueLabel={true}

@@ -12,9 +12,10 @@ import { getSocket } from '../socket';
 import SearchOpponent from '../components/SearchOpponent';
 import { OPPONENT_FOUND, OPPONENT_LEFT_MATCH_FROM_SERVER, OPPONENT_NOT_FOUND, SEARCH_FOR_AN_OPPONENT } from '../constants/events';
 import { useDispatch, useSelector } from 'react-redux';
-import { resetGameRoom, setCurrentTurn, setMyBoard, setPlayer1, setPlayer2 } from '../redux/reducers/gameRoom';
+import { resetGameRoom, setCurrentTurn, setGameId, setMyBoard, setPlayer1, setPlayer2 } from '../redux/reducers/gameRoom';
 import { ERROR_SAVING_GAME } from '../constants/events';
 import PlayWithFriend from '../components/PlayWithFriend';
+import { userExists } from '../redux/reducers/auth';
 
 const AllBoards = () => {
     useDocumentTitle("All Boards | Bingo");
@@ -47,7 +48,7 @@ const AllBoards = () => {
     const closeSearchModal = () => {
         setOpenSearchModal(false);
     };
-    
+
     // setting for play with friend modal
     const handlePlayWithFriendModalOpenChange = (open) => {
         setOpenPlayWithFriendModal(open);
@@ -107,13 +108,21 @@ const AllBoards = () => {
 
     // Listen for the opponent found event
     useEffect(() => {
-        socket.on(OPPONENT_FOUND, ({ currentPlayer, opponentPlayer, currentTurn }) => {
+        socket.on(OPPONENT_FOUND, ({ currentPlayer, opponentPlayer, currentTurn, gameId }) => {
             setOpponent(opponentPlayer.userDetail);
             console.log("AAYA OPPONENT_FOUND main");
+
+            // currentPlayer is now updated so we have to save in redux as well as in local storage
+            dispatch(userExists(currentPlayer.userDetail));
+            localStorage.setItem("user", JSON.stringify(currentPlayer.userDetail))
+
             dispatch(setPlayer1(currentPlayer));
             dispatch(setPlayer2(opponentPlayer));
             dispatch(setMyBoard(board));
             dispatch(setCurrentTurn(currentTurn));
+            dispatch(setGameId(gameId));
+            localStorage.setItem("gameId", gameId)
+
 
             // Navigate to the game room after 4 seconds
             setTimeout(() => {
@@ -297,7 +306,7 @@ const AllBoards = () => {
                 {/* Modal for Play with friend */}
                 {
                     openPlayWithFriendModal && (
-                        <PlayWithFriend 
+                        <PlayWithFriend
                             boardID={board._id}
                             isOpen={openPlayWithFriendModal}
                             onOpenChange={handlePlayWithFriendModalOpenChange}

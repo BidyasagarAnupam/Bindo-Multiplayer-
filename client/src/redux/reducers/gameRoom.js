@@ -5,7 +5,8 @@ const initialState = {
     player1: null,
     player2: null,
     myBoard: null,
-    currentTurn: null
+    currentTurn: null,
+    gameId: localStorage.getItem('gameId') || null,
 
 };
 
@@ -25,15 +26,18 @@ const gameRoomSlice = createSlice({
         setCurrentTurn: (state, action) => {
             state.currentTurn = action.payload;
         },
+        setGameId: (state, action) => {
+            state.gameId = action.payload;
+        },
         resetGameRoom: (state) => {
             state.player1 = null;
             state.player2 = null;
             state.myBoard = null;
             state.currentTurn = null;
-
+            state.gameId = null;
         },
     }
 })
 
 export default gameRoomSlice;
-export const { setPlayer1, setPlayer2, setMyBoard, setCurrentTurn, resetGameRoom } = gameRoomSlice.actions;
+export const { setPlayer1, setPlayer2, setMyBoard, setCurrentTurn, setGameId, resetGameRoom } = gameRoomSlice.actions;
