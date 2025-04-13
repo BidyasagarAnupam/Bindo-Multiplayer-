@@ -8,26 +8,26 @@ const Profile = () => {
 
 
   const { user } = useSelector((state) => state.auth)
-  console.log("User ", user);
 
   return (
-    <div className='flex flex-col gap-3  h-full lg:h-2/3'>
+    <div className='flex flex-col gap-3  h-auto lg:h-2/3'>
       {/* profile picture, user name and email */}
-      <div className='h-1/4 w-full bg-[#18181bda] rounded-lg px-3 flex gap-2 md:gap-10 items-center md:p-4 md:pl-10'>
+      <div className='w-full bg-[#18181bda] rounded-lg px-3 py-5 flex gap-2 md:gap-10 items-center md:pl-10'>
         <Avatar
-          size='lg'
+          // size='lg'
           isBordered
           color='primary'
-          className='h-20 w-20 lg:h-24 lg:w-24'
-          src={user.profileDetails.avatar} />
+          className='h-6 w-6 md:h-10 md:w-10 lg:h-24 lg:w-24'
+          src={user.profileDetails.avatar} 
+          />
         <div className='flex flex-col gap-1 ml-4'>
           <p className='text-xl font-bold text-white'>@{user.userName}</p>
           <p className='text-md text-default-400'>{user.email}</p>
           </div>
       </div>
       {/* and all details */}
-      <div className='h-3/4  flex flex-col md:flex-row gap-3'>
-        <div className='bg-[#18181bda] w-full  md:w-1/2 h-full rounded-lg p-3 flex flex-col justify-around'>
+      <div className=' flex flex-col md:flex-row gap-3'>
+        <div className='bg-[#18181bda] w-full  md:w-1/2 h-full rounded-lg p-5 flex flex-col gap-4'>
           <Input
             isReadOnly
             size='lg'
@@ -53,7 +53,7 @@ const Profile = () => {
             color={`${user.profileDetails.dob ? 'default' : 'warning'}`}
           />
         </div>
-        <div className='bg-[#18181bda] w-full  md:w-1/2 h-full rounded-lg p-3 flex flex-col justify-around'>
+        <div className='bg-[#18181bda] w-full  md:w-1/2 h-full rounded-lg p-5 flex flex-col gap-4 overflow-y-auto'>
           <Input
             isReadOnly
             size='lg'

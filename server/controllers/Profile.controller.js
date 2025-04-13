@@ -5,6 +5,7 @@ import { Game } from "../models/Game.models.js"
 import { Profile } from "../models/Profile.models.js";
 import { BINGO_TOKEN } from "../constants/config.constants.js";
 import { cookieOptions, uploadImageToCloudinary } from "../utils/features.js";
+import { ErrorHandler } from "../utils/utility.js";
 
 
 const getMyProfile = TryCatch(async (req, res, next) => {

@@ -259,7 +259,7 @@ const AllBoards = () => {
                                                 className='text-medium md:font-semibold md:w-full'
                                                 color='primary'
                                                 variant='shadow'
-                                                onClick={() => searchOpponentHandler()}
+                                                onPress={() => searchOpponentHandler()}
                                             >
                                                 Search for an opponent
                                             </Button>

@@ -10,6 +10,8 @@ import fileUpload from "express-fileupload";
 import userRoute from './routes/User.routes.js';
 import profileRoute from "./routes/Profile.routes.js";
 import boardRoute from "./routes/Board.routes.js";
+import gameRoute from "./routes/Game.routes.js"
+
 import { errorMiddleware } from "./middlewares/tryCatch.js";
 import { corsOptions } from "./constants/config.constants.js";
 import { socketAuthenticator } from "./middlewares/auth.js";
@@ -59,6 +61,7 @@ cloudinaryConnect()
 app.use("/api/v1/user", userRoute)
 app.use("/api/v1/profile", profileRoute)
 app.use("/api/v1/board", boardRoute)
+app.use("/api/v1/game", gameRoute)
 
 
 app.get("/", (req, res) => {
@@ -539,7 +542,7 @@ io.on("connection", (socket) => {
     });
 
 
-    // Todo: Here also create Room document in the database, krna hai
+    //  Here also create Room document in the database
     // Join Room (Play with Friend)
     socket.on(JOIN_ROOM, async ({ boardID, roomId }, callback) => {
         const room = allRooms.find((r) => r.roomId === roomId);

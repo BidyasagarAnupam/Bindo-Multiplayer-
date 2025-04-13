@@ -37,7 +37,7 @@ const Sidebar = ({ isOpen, setIsOpen }) => {
         p-1
         md:p-3 bg-[#18181b] rounded-md
         ${isMobile ?
-            'bottom-0 left-0 right-0 w-full z-50 flex-row  items-center justify-between' :
+            'bottom-0 left-0 right-0 w-full z-50 flex-row h-12  items-center justify-between' :
             "flex-col justify-around items-center h-[70vh]"}
         `}>
           <Tooltip content="Open menu">

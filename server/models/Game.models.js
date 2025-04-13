@@ -7,12 +7,6 @@ const GameSchema = new Schema({
         {
             type: Types.ObjectId,
             ref: 'User',
-            // validate: {
-            //     validator: function (v) {
-            //         return v.length === 2;
-            //     },
-            //     message: props => `Players array must have exactly 2 elements.`
-            // }
         }
     ],
     status: {
@@ -24,12 +18,6 @@ const GameSchema = new Schema({
         {
             type: Types.ObjectId,
             ref: 'Board',
-            // validate: {
-            //     validator: function (v) {
-            //         return v.length === 2;
-            //     },
-            //     message: props => `Boards array must have exactly 2 elements.`
-            // }
         }
     ],
     winner: {

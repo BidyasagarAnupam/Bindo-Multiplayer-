@@ -10,7 +10,6 @@ const SocketProvider = ({ children }) => {
 
     const socket = useMemo(() => io(serverURL, { withCredentials: true }), []);
 
-
     return (
         <SocketContext.Provider value={socket}>{children}</SocketContext.Provider>
     );
