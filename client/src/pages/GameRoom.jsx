@@ -375,6 +375,7 @@ const GameRoom = () => {
             </div>
 
             <div className='flex w-full md:w-2/3 items-center justify-center relative'>
+              {/* Cartoon gif */}
               <Avatar
                 src={currentTurn === player1?.userDetail.userName ? YOURTURNGIF : OPPONENTTURNGIF}
                 className={`w-24 h-24 md:w-32 md:h-32 text-large z-10 absolute 

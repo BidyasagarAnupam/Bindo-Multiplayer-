@@ -6,6 +6,10 @@ Welcome to the Bingo Game! This is a web-based multiplayer game where players ca
 
 ## Features
 
+### Ongoing Features
+1. **Send Friend Requests and Accept (with Real-Time Notifications)**
+   - Add friends and get notified when they accept your requests.
+
 ### Completed Features
 1. **Sign Up**
    - Create a new account to join the Bingo platform.
@@ -42,17 +46,21 @@ Welcome to the Bingo Game! This is a web-based multiplayer game where players ca
 
 1. **View Statistics of Your Game**
    - Track your wins, losses, and other performance metrics.
+   
+2. **Add timer for one move**
+   - Player have 20 seconds to play his/her move, if player can't play then moves goes to opponent and if player skip 3 times then player will lose the game.
+   - This will add a time challenge to the game, making it more exciting.  
 
-2. **Send Friend Requests and Accept (with Real-Time Notifications)**
+3. **Send Friend Requests and Accept (with Real-Time Notifications)**
    - Add friends and get notified when they accept your requests.
 
-3. **Chat with Friends**
+4. **Chat with Friends**
    - Communicate with your friends directly on the platform.
 
-4. **Earn Coins and Use Them to Create Boards**
+5. **Earn Coins and Use Them to Create Boards**
    - Earn in-game currency by playing and use it to unlock new features.
 
-5. **And Many More...**
+6. **And Many More...**
    - Stay tuned for more exciting updates and features!
 
 ---
