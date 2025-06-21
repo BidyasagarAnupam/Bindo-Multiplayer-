@@ -14,7 +14,7 @@ Welcome to the Bingo Game! This is a web-based multiplayer game where players ca
    - Secure authentication to access your Bingo profile.
 
 3. **Create Bingo Boards (Or Generate)**
-   - Customize your Bingo board manually or generate one randomly.
+   - Customise your Bingo board manually or generate one randomly.
 
 4. **Choose Any Board for Play**
    - Select from your created boards to use during the game.
@@ -31,7 +31,10 @@ Welcome to the Bingo Game! This is a web-based multiplayer game where players ca
    - Manage your profile and view personal details.
 
 8. **Settings Section**
-   - Customize your game experience with various settings.
+   - Customise your game experience with various settings.
+     
+9. **Game History**
+   - Review past games and analyse your gameplay.
 
 ---
 
@@ -40,19 +43,16 @@ Welcome to the Bingo Game! This is a web-based multiplayer game where players ca
 1. **View Statistics of Your Game**
    - Track your wins, losses, and other performance metrics.
 
-2. **Game History**
-   - Review past games and analyze your gameplay.
-
-3. **Send Friend Requests and Accept (with Real-Time Notifications)**
+2. **Send Friend Requests and Accept (with Real-Time Notifications)**
    - Add friends and get notified when they accept your requests.
 
-4. **Chat with Friends**
+3. **Chat with Friends**
    - Communicate with your friends directly on the platform.
 
-5. **Earn Coins and Use Them to Create Boards**
+4. **Earn Coins and Use Them to Create Boards**
    - Earn in-game currency by playing and use it to unlock new features.
 
-6. **And Many More...**
+5. **And Many More...**
    - Stay tuned for more exciting updates and features!
 
 ---
@@ -117,6 +117,6 @@ This project is licensed under the MIT License. See the [LICENSE](./LICENSE) fil
 
 ## Contact
 
-For any queries or feedback (for UI or anything) , please reach out to:
+For any queries or feedback (for UI or anything), please reach out to:
 
 - **Email**: mohapatrasatya152@gamil.com
